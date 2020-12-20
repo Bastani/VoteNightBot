@@ -97,7 +97,11 @@ namespace VoteNightBot
                 await localContext.User.AddAsync(localUser);
             }
 
-            if (!localUser.Voted)
+            if (string.IsNullOrWhiteSpace(movie.Title))
+            {
+                await Context.Channel.SendMessageAsync($"Movie not found: {movieString}");
+            }
+            else if (!localUser.Voted)
             {
                 var localMovie = await localContext.Movie.FindAsync(movie.IMDbID);
                 if (localMovie == null)
@@ -118,7 +122,9 @@ namespace VoteNightBot
             }
             else
             {
-                await Context.Channel.SendMessageAsync($"Already voted for movie: {(await localContext.Movie.FindAsync(localUser.MoviePickedId)).Title}");
+                var votedMovie = await localContext.Movie.FindAsync(localUser.MoviePickedId);
+                movie = await client.GetItemByID(votedMovie.ID);
+                await Context.Channel.SendMessageAsync($"Already voted for movie: {votedMovie.Title}", embed:Movie.GetMovieEmbed(movie));
             }
 
             await localContext.SaveChangesAsync();

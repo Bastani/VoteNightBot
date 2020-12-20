@@ -34,8 +34,11 @@ namespace VoteNightBot.Models
                 builder.AddField("Rating", movie.IMDbRating, true);
             if (!string.IsNullOrWhiteSpace(movie.Director))
                 builder.AddField("Directors", movie.Director, true);
-            if (!string.IsNullOrWhiteSpace(movie.Writer))
-                builder.AddField("Writer", movie.Writer, true);
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(movie.Writer))
+                    builder.AddField("Writer", movie.Writer, true);
+            }
             if (!string.IsNullOrWhiteSpace(movie.Year))
                 builder.AddField("Year", movie.Year, true);
             if (!string.IsNullOrWhiteSpace(movie.Plot))

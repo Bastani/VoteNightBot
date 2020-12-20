@@ -21,7 +21,7 @@ namespace VoteNightBot.Services
             Configure();
         }
 
-        public void Configure()
+        private void Configure()
         {
             if (!File.Exists(_path))
             {
