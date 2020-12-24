@@ -42,7 +42,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          # tag=$(git describe --tags --abbrev=0)
+          tag="Auto-Release - " $(date)
           release_name="VoteNightBot-${{ matrix.target }}"
           # Build everything
           dotnet publish VoteNightBot/VoteNightBot.csproj --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "$release_name"
@@ -55,10 +55,11 @@ jobs:
           fi
           # Delete output directory
           rm -r "$release_name"
+          rm "/VoteNightBot/VoteNightBot.sln"
       - name: Publish
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "Auto-Release"
+          tag_name: "$tag"
           files: "VoteNightBot*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
