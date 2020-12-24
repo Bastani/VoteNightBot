@@ -42,7 +42,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          tag="Auto-Release - " $(date)
+          tag="Auto-Release - $now"
           release_name="VoteNightBot-${{ matrix.target }}"
           # Build everything
           dotnet publish VoteNightBot/VoteNightBot.csproj --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "$release_name"
