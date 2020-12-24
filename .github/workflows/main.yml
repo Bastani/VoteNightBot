@@ -42,6 +42,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
+          now=$(date)
           tag="Auto-Release - $now"
           release_name="VoteNightBot-${{ matrix.target }}"
           # Build everything
@@ -55,7 +56,7 @@ jobs:
           fi
           # Delete output directory
           rm -r "$release_name"
-          rm "/VoteNightBot/VoteNightBot.sln"
+          rm "/VoteNightBot.sln"
       - name: Publish
         uses: softprops/action-gh-release@v1
         with:
