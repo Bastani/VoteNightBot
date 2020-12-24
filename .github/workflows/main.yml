@@ -59,7 +59,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: "Auto-Release"
-          files: "App*"
+          files: "VoteNightBot*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
