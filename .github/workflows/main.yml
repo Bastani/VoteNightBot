@@ -56,7 +56,7 @@ jobs:
           fi
           # Delete output directory
           rm -r "$release_name"
-          rm "/VoteNightBot.sln"
+          rm "VoteNightBot.sln"
       - name: Publish
         uses: softprops/action-gh-release@v1
         with:
