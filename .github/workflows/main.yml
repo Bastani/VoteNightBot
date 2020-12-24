@@ -43,8 +43,9 @@ jobs:
         shell: bash
         run: |
           now=$(date '+%F')
-          echo "TAG_NAME='Auto-Release-$now'" >> $GITHUB_ENV
-          release_name="VoteNightBot-$now-${{ matrix.target }}"
+          now2=$(date '+%F-%H%M')
+          echo "TAG_NAME=Auto-Release-$now" >> $GITHUB_ENV
+          release_name="VoteNightBot-$now2-${{ matrix.target }}"
           # Build everything
           dotnet publish VoteNightBot/VoteNightBot.csproj --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "$release_name"
           # Pack files
