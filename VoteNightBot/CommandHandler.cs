@@ -73,7 +73,7 @@ namespace VoteNightBot
         [Summary("Searches a movie on IMDB.")]
         public async Task SearchAsync([Summary("The movie to search.")][Remainder] string movieString)
         {
-            var client = new OMDbSharp.OMDbClient(Environment.GetEnvironmentVariable("OMDbAPI", EnvironmentVariableTarget.User), true);
+            var client = new OMDbSharp.OMDbClient(Environment.GetEnvironmentVariable("OMDbAPI"), true);
             var movie = await client.GetItemByTitle(movieString);
             
             await Context.Channel.SendMessageAsync(string.Empty, embed: Movie.GetMovieEmbed(movie));
@@ -83,7 +83,7 @@ namespace VoteNightBot
         [Summary("Adds a movie to database.")]
         public async Task AddAsync([Summary("The movie to add.")][Remainder] string movieString)
         {
-            var client = new OMDbSharp.OMDbClient(Environment.GetEnvironmentVariable("OMDbAPI", EnvironmentVariableTarget.User), true);
+            var client = new OMDbSharp.OMDbClient(Environment.GetEnvironmentVariable("OMDbAPI"), true);
             var movie = await client.GetItemByTitle(movieString);
 
             var localContext = new SqliteContext();
