@@ -42,7 +42,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          now=$(date '+%F-%T')
+          now=$(date '+%F-%H-%M-%S')
           tag="Auto-Release-$now"
           release_name="VoteNightBot-$tag-${{ matrix.target }}"
           # Build everything
