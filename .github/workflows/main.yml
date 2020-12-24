@@ -44,7 +44,7 @@ jobs:
         run: |
           now=$(date)
           tag="Auto-Release - $now"
-          release_name="VoteNightBot-${{ matrix.target }}"
+          release_name="VoteNightBot-$tag-${{ matrix.target }}"
           # Build everything
           dotnet publish VoteNightBot/VoteNightBot.csproj --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "$release_name"
           # Pack files
@@ -60,7 +60,7 @@ jobs:
       - name: Publish
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "$tag"
+          tag_name: "Auto-Release"
           files: "VoteNightBot*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
