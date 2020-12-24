@@ -13,12 +13,12 @@ namespace VoteNightBot
     public class CommandHandler
     {
         private readonly DiscordSocketClient _client;
-        private readonly CommandService _commands;
+        public static CommandService Commands { get; set; }
 
         // Retrieve client and CommandService instance via ctor
         public CommandHandler(DiscordSocketClient client, CommandService commands)
         {
-            _commands = commands;
+            Commands = commands;
             _client = client;
         }
 
@@ -35,7 +35,7 @@ namespace VoteNightBot
             //
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
-            await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
+            await Commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
                                             services: null);
         }
 
@@ -49,7 +49,7 @@ namespace VoteNightBot
             int argPos = 0;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasCharPrefix('!', ref argPos) ||
+            if (!(message.HasCharPrefix('/', ref argPos) ||
                 message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
                 message.Author.IsBot)
                 return;
@@ -59,14 +59,14 @@ namespace VoteNightBot
 
             // Execute the command with the command context we just
             // created, along with the service provider for precondition checks.
-            await _commands.ExecuteAsync(
+            await Commands.ExecuteAsync(
                 context: context,
                 argPos: argPos,
                 services: null);
         }
     }
 
-    [Group("votenight")]
+    [Summary("The Movie Module.")][Name("Movie")]
     public class MovieModule : ModuleBase<SocketCommandContext>
     {
         [Command("search")]
@@ -217,6 +217,13 @@ namespace VoteNightBot
             }
 
             await localContext.SaveChangesAsync();
+        }
+
+        [Command("help"), Alias("assist"), Summary("Shows help menu.")]
+        public async Task Help([Remainder] string command = null)
+        {
+            var helpEmbed = CommandHandler.Commands.GetDefaultHelpEmbed(command);
+            await Context.Channel.SendMessageAsync(embed: helpEmbed);
         }
     }
 }
