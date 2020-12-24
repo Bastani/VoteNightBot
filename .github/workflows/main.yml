@@ -42,12 +42,10 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          tag=$(git describe --tags --abbrev=0)
-          release_name="VoteNightBot-$tag-${{ matrix.target }}"
-          echo release_name
+          # tag=$(git describe --tags --abbrev=0)
+          release_name="VoteNightBot-${{ matrix.target }}"
           # Build everything
           dotnet publish src/VoteNightBot/VoteNightBot.csproj --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "$release_name"
-          echo `src/VoteNightBot/VoteNightBot.csproj --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "$release_name"`
           # Pack files
           if [ "${{ matrix.target }}" == "win-x64" ]; then
             # Pack to zip for Windows
