@@ -60,7 +60,7 @@ jobs:
       - name: Publish
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "Auto-Release"
+          tag_name: $(date '+%F')
           files: "VoteNightBot*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
