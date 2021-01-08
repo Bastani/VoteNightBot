@@ -32,5 +32,19 @@ namespace VoteNightBot.Services
             var serializer = new SharpSerializer();
             return serializer.Deserialize(stream) as T;
         }
+
+        public static string GetEnvironmentVariable(string variable)
+        {
+            var token = Environment.GetEnvironmentVariable(variable);
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                token = Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.User);
+            }
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                token = Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.Machine);
+            }
+            return token;
+        }
     }
 }

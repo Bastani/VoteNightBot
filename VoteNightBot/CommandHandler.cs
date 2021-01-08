@@ -73,7 +73,8 @@ namespace VoteNightBot
         [Summary("Searches a movie on IMDB.")]
         public async Task SearchAsync([Summary("The movie to search.")][Remainder] string movieString)
         {
-            var client = new OMDbSharp.OMDbClient(Environment.GetEnvironmentVariable("OMDbAPI"), true);
+            
+            var client = new OMDbSharp.OMDbClient(Extensions.GetEnvironmentVariable("OMDbAPI"), true);
             var movie = await client.GetItemByTitle(movieString);
             
             await Context.Channel.SendMessageAsync(string.Empty, embed: Movie.GetMovieEmbed(movie));
@@ -81,9 +82,9 @@ namespace VoteNightBot
 
         [Command("vote")]
         [Summary("Adds a movie to database.")]
-        public async Task AddAsync([Summary("The movie to add.")][Remainder] string movieString)
+        public async Task VoteAsync([Summary("The movie to add.")][Remainder] string movieString)
         {
-            var client = new OMDbSharp.OMDbClient(Environment.GetEnvironmentVariable("OMDbAPI"), true);
+            var client = new OMDbSharp.OMDbClient(Extensions.GetEnvironmentVariable("OMDbAPI"), true);
             var movie = await client.GetItemByTitle(movieString);
 
             var localContext = new SqliteContext();
@@ -118,13 +119,12 @@ namespace VoteNightBot
                 localUser.MoviePickedId = localMovie.ID; 
                 localMovie.VoteCount++;
 
-                await Context.Channel.SendMessageAsync($"Voted for movie: {movie.Title}", embed:Movie.GetMovieEmbed(movie));
+                await Context.Channel.SendMessageAsync($"Voted for movie: {movie.Title}", embed:Movie.GetMovieEmbedLite(movie));
             }
             else
             {
                 var votedMovie = await localContext.Movie.FindAsync(localUser.MoviePickedId);
-                movie = await client.GetItemByID(votedMovie.ID);
-                await Context.Channel.SendMessageAsync($"Already voted for movie: {votedMovie.Title}", embed:Movie.GetMovieEmbed(movie));
+                await Context.Channel.SendMessageAsync($"Already voted for movie: {votedMovie.Title}");
             }
 
             await localContext.SaveChangesAsync();
@@ -177,9 +177,10 @@ namespace VoteNightBot
 
                 var builder = new EmbedBuilder();
                 builder.Title = "Movie List";
-                foreach (var movie in movieList)
+                var sortedMovieList = movieList.OrderByDescending(a => a.VoteCount).ToList();
+                for (var i = 0; i < movieList.Count && builder.Fields.Count < 25; i++)
                 {
-                    builder.AddField(movie.Title, movie.VoteCount, true);
+                    builder.AddField(sortedMovieList[i].Title, sortedMovieList[i].VoteCount);
                 }
 
                 await Context.Channel.SendMessageAsync(string.Empty, embed: builder.Build());
@@ -198,7 +199,7 @@ namespace VoteNightBot
         {
             var localContext = new SqliteContext();
 
-            var movieList = localContext.Movie.ToList().Where(a => a.VoteCount > 0).ToList();
+            var movieList = localContext.Movie.ToList();
             var userList = localContext.User.ToList().Where(a => a.Voted).ToList();
 
             if (movieList.Any())
@@ -224,6 +225,38 @@ namespace VoteNightBot
         {
             var helpEmbed = CommandHandler.Commands.GetDefaultHelpEmbed(command);
             await Context.Channel.SendMessageAsync(embed: helpEmbed);
+        }
+
+        [Command("who")]
+        [Summary("View all users in Database")]
+        public async Task WhoAsync()
+        {
+            var localContext = new SqliteContext();
+
+            var userList = localContext.User.ToList();
+
+            if (userList.Any())
+            {
+                var builder = new EmbedBuilder {Title = "User List"};
+                var sortedUserList = userList.OrderByDescending(a => a.MoviePickedId).ToList();
+                for (var i = 0; i < userList.Count && i < 25; i++)
+                {
+                    var user = sortedUserList[i];
+                    var discordUser = Context.Client.GetUser(ulong.Parse(user.ID));
+                    if (discordUser != null && builder.Fields.Count < 25)
+                    {
+                        builder.AddField(discordUser.Username,
+                            user.Voted
+                                ? $"Voted: Movie: {(await localContext.Movie.FindAsync(user.MoviePickedId)).Title}"
+                                : "Voted: Movie: N/A");
+                    }
+                }
+                await Context.Channel.SendMessageAsync(string.Empty, embed: builder.Build());
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync("There are no movies");
+            }
         }
     }
 }
